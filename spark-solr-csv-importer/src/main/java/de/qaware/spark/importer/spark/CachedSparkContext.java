@@ -1,11 +1,23 @@
+/*
+ _____________________________________________________________________________
+
+            Project:    BigData 2016
+  _____________________________________________________________________________
+
+         Created by:    Johannes Weigend, QAware GmbH
+      Creation date:    September 2016
+  _____________________________________________________________________________
+
+          License:      Apache License 2.0
+  _____________________________________________________________________________
+ */
 package de.qaware.spark.importer.spark;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import java.io.Serializable;
-
 /**
+ * Helper to create a Spark context.
  * Created by weigend on 20.09.16.
  */
 public class CachedSparkContext  {
@@ -27,7 +39,7 @@ public class CachedSparkContext  {
 
     /**
      * Constructor initializes the JavaSparkContext.
-     * @param sparkMasterUrl
+     * @param sparkMasterUrl the Spark Master Url.
      */
     private CachedSparkContext(String sparkMasterUrl) {
         SparkConf sparkConf = new SparkConf();
@@ -47,7 +59,7 @@ public class CachedSparkContext  {
 
     /**
      * @return a cached Spark context.
-     * @param sparkMasterUrl
+     * @param sparkMasterUrl the Spark Master Url.
      */
     public synchronized static CachedSparkContext instance(String sparkMasterUrl) {
         if (context == null) {

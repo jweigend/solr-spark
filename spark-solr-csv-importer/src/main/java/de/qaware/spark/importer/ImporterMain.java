@@ -1,3 +1,16 @@
+/*
+ _____________________________________________________________________________
+
+            Project:    BigData 2016
+  _____________________________________________________________________________
+
+         Created by:    Johannes Weigend, QAware GmbH
+      Creation date:    September 2016
+  _____________________________________________________________________________
+
+          License:      Apache License 2.0
+  _____________________________________________________________________________
+ */
 package de.qaware.spark.importer;
 
 import de.qaware.spark.importer.spark.CachedSparkContext;
@@ -6,6 +19,7 @@ import de.qaware.spark.importer.spark.SparkSolrMetricsImporter;
 import java.util.Date;
 
 /**
+ * Imports a bunch of CSV files into Solr with the help of a Spark cluster.
  * Created by weigend on 23.09.16.
  */
 public class ImporterMain {

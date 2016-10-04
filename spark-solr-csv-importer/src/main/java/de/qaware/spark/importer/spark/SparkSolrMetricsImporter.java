@@ -1,10 +1,21 @@
+/*
+ _____________________________________________________________________________
+
+            Project:    BigData 2016
+  _____________________________________________________________________________
+
+         Created by:    Johannes Weigend, QAware GmbH
+      Creation date:    September 2016
+  _____________________________________________________________________________
+
+          License:      Apache License 2.0
+  _____________________________________________________________________________
+ */
 package de.qaware.spark.importer.spark;
 
 import de.qaware.spark.importer.MetricsImporter;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -21,17 +32,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
- * Imports Metric CSVs
+ * Parallel CSV Import Sample. Metric CSVs must have the following form:
+ *
+ * CSV
+ * ----------------------------------------------------------
+ * Date; Metric-Name1; Metric2; Metric3 ...
+ * dd.MM.yyyy HH:mm:ss.SSS; 100,100,100.000 (US Format)
+ * ----------------------------------------------------------
+ *
  * Created by weigend on 20.09.16.
  */
 public class
 SparkSolrMetricsImporter implements MetricsImporter, Serializable {
 
     /**
-     * The batch size for imports.
+     * The batch size for imports. Batching is important.
      */
     private static final int BATCH_SIZE = 100000;
 
@@ -40,16 +57,20 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
      */
     private static final String DELIMITER = ";";
 
-
+    /**
+     * The collection name of the Solr collection to import the data.
+     */
     private static final String COLLECTION_NAME = "ekgdata2";
 
     /**
-     * The ZK_HOST.
+     * The Zookeeper URL (host/port). f.e. localhost:2181.
      */
     private String zkHost;
 
 
-    // Serialization requires this.
+    /**
+     *  A default constructor is required by Spark to serialize this class and their lambdas.
+     */
     public SparkSolrMetricsImporter() {
     }
 
@@ -144,8 +165,6 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
         }
     }
 
-    private long id = 0;
-
     /**
      * Helper to import a single csv line.
      *
@@ -184,7 +203,7 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
         private String type;
         private String hostName;
 
-        public FileNameParts(String fileUrl) {
+        FileNameParts(String fileUrl) {
             String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
             String[] splits = fileName.split("_");
             this.hostName = splits[0];
@@ -192,15 +211,15 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
             this.type = splits[2];
         }
 
-        public String getProcessName() {
+        String getProcessName() {
             return processName;
         }
 
-        public String getType() {
+        String getType() {
             return type;
         }
 
-        public String getHostName() {
+        String getHostName() {
             return hostName;
         }
     }
