@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.parquet:parquet-jackson:1.7.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/parquet/parquet-jackson/1.7.0/parquet-jackson-1.7.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

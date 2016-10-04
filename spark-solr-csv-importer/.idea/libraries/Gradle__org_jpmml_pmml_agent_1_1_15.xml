@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jpmml:pmml-agent:1.1.15">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jpmml/pmml-agent/1.1.15/pmml-agent-1.1.15.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

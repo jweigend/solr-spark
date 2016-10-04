@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.scalamacros:quasiquotes_2.10:2.0.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scalamacros/quasiquotes_2.10/2.0.0/6ab757e35e052c192ae2b10d864cd5e6b4045aa3/quasiquotes_2.10-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scalamacros/quasiquotes_2.10/2.0.0/6f935729b12cabef0a60a8154fa62d6c169bf398/quasiquotes_2.10-2.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

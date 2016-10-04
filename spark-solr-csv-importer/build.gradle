@@ -1,0 +1,46 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+group 'de.qaware'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+
+    compile group: 'org.apache.spark', name: 'spark-core_2.10', version: '1.6.2'
+    compile group: 'org.apache.solr', name: 'solr-solrj', version: '6.2.1'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+shadowJar {
+    dependencies {
+        include(dependency('org.apache.solr:solr-solrj:6.2.1'))
+        include(dependency('org.noggit:noggit:0.6'))
+        include(dependency('org.apache.httpcomponents:httpmime:4.4.1'))
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        // fail eagerly on version conflict (includes transitive dependencies)
+        // e.g. multiple different versions of the same dependency (group and name are equal)
+        //failOnVersionConflict()
+        forcedModules = ['com.fasterxml.jackson.core:jackson-databind:2.4.4',
+                         'com.fasterxml.jackson.core:jackson-annotations:2.4.4',
+                         'com.fasterxml.jackson.core:jackson-core:2.4.4',
+                         'org.apache.curator:curator-recipes:2.8.0',
+                         'org.slf4j:slf4j-api:1.7.7',
+                         'org.slf4j:jcl-over-slf4j:1.7.7']
+    }
+}
+

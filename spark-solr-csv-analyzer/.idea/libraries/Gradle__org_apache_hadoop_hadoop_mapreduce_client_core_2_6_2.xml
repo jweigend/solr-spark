@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.hadoop:hadoop-mapreduce-client-core:2.6.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hadoop/hadoop-mapreduce-client-core/2.6.2/83b7114877673a0a58f7aca7af9779d05f780f77/hadoop-mapreduce-client-core-2.6.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hadoop/hadoop-mapreduce-client-core/2.6.2/1656683c1833394a928826201401fd61175b5db2/hadoop-mapreduce-client-core-2.6.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

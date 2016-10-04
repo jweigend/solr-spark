@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: org.twitter4j:twitter4j-stream:4.0.4">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/twitter4j/twitter4j-stream/4.0.4/twitter4j-stream-4.0.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
