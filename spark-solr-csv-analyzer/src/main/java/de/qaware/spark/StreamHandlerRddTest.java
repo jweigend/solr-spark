@@ -1,23 +1,33 @@
+/*
+ _____________________________________________________________________________
+
+            Project:    BigData 2016
+  _____________________________________________________________________________
+
+         Created by:    Johannes Weigend, QAware GmbH
+      Creation date:    September 2016
+  _____________________________________________________________________________
+
+          License:      Apache License 2.0
+  _____________________________________________________________________________
+ */
 package de.qaware.spark;
 
 import com.lucidworks.spark.rdd.SolrJavaRDD;
 import com.lucidworks.spark.rdd.SolrRDD;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.common.SolrDocument;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import scala.Option;
 import scala.Some;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
+ * Using the StreamHandler to stream results of a single Solr Server (all shards from that server!)
  * Created by weigend on 04.10.16.
  */
 public class StreamHandlerRddTest {
@@ -27,12 +37,9 @@ public class StreamHandlerRddTest {
         //final String sparkMasterUrl = "local[*]";
         final String sparkMasterUrl = "spark://192.168.1.100:7077";
 
-        Date start = new Date();
-        JavaSparkContext context = null;
-        try {
-            SparkConf conf = new SparkConf().setMaster(sparkMasterUrl).setAppName("SparkSolrCsvAnayzer");
+        SparkConf conf = new SparkConf().setMaster(sparkMasterUrl).setAppName("SparkSolrCsvAnayzer");
 
-            context = new JavaSparkContext(conf);
+        try (JavaSparkContext context = new JavaSparkContext(conf)) {
             context.addJar("./build/libs/spark-solr-csv-analyzer-1.0-SNAPSHOT-all.jar");
 
             String expr =
@@ -55,7 +62,7 @@ public class StreamHandlerRddTest {
                     Some.empty(),
                     Some.empty(),
                     Some.empty(),
-                    new Some(solrQuery));
+                    new Some<>(solrQuery));
 
             SolrJavaRDD rdd = new SolrJavaRDD(streamExprRDD);
 
@@ -67,8 +74,9 @@ public class StreamHandlerRddTest {
             System.out.println(Arrays.deepToString(d.toArray()));
 
         } finally {
+            //noinspection ThrowFromFinallyBlock,ResultOfMethodCallIgnored
             System.in.read();
-            context.close();
+
         }
     }
 }

@@ -1,10 +1,20 @@
+/*
+ _____________________________________________________________________________
+
+            Project:    BigData 2016
+  _____________________________________________________________________________
+
+         Created by:    Johannes Weigend, QAware GmbH
+      Creation date:    September 2016
+  _____________________________________________________________________________
+
+          License:      Apache License 2.0
+  _____________________________________________________________________________
+ */
 package de.qaware.spark;
 
-import com.lucidworks.spark.rdd.SolrJavaRDD;
 import com.lucidworks.spark.rdd.SolrRDD;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.io.Tuple;
-import org.apache.solr.common.SolrDocument;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Some;
@@ -13,9 +23,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 /**
+ * Tests a SolrRDD in combination with the /export Handler.
  * Created by weigend on 04.10.16.
  */
 public class ExportHandlerRddTest {
@@ -25,11 +35,9 @@ public class ExportHandlerRddTest {
         //final String sparkMasterUrl = "local[*]";
         final String sparkMasterUrl = "spark://192.168.1.100:7077";
 
-        JavaSparkContext context = null;
-        try {
-            SparkConf conf = new SparkConf().setMaster(sparkMasterUrl).setAppName("SparkSolrCsvAnayzer");
+        SparkConf conf = new SparkConf().setMaster(sparkMasterUrl).setAppName("SparkSolrCsvAnayzer");
 
-            context = new JavaSparkContext(conf);
+        try (JavaSparkContext context = new JavaSparkContext(conf)) {
             context.addJar("./build/libs/spark-solr-csv-analyzer-1.0-SNAPSHOT-all.jar");
 
             // make sure executors are up an running
@@ -51,13 +59,13 @@ public class ExportHandlerRddTest {
                     solrZkHost,
                     "ekgdata2",
                     context.sc(),
-                    new Some("/export"),
+                    new Some<>("/export"),
                     Some.empty(),
                     Some.empty(),
                     Some.empty(),
                     Some.empty(),
                     Some.empty(),
-                    new Some(solrQuery));
+                    new Some<>(solrQuery));
 
             long exportedDocs = simpleRdd.count();
 
@@ -67,11 +75,12 @@ public class ExportHandlerRddTest {
             System.out.println("Result: " + exportedDocs + " SolrDocuments read in Spark in " + (duration) + " ms.");
 
             simpleRdd.query(solrQuery);
-            System.out.println(Arrays.deepToString((Object[])simpleRdd.take(5)));
+            System.out.println(Arrays.deepToString((Object[]) simpleRdd.take(5)));
 
         } finally {
+            //noinspection ThrowFromFinallyBlock,ResultOfMethodCallIgnored
             System.in.read();
-            context.close();
+
         }
     }
 }
