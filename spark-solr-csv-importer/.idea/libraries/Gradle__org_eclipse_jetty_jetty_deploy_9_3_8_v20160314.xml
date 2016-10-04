@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: org.eclipse.jetty:jetty-deploy:9.3.8.v20160314">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/jetty/jetty-deploy/9.3.8.v20160314/jetty-deploy-9.3.8.v20160314.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: org.spark-project.hive:hive-cli:1.2.1.spark">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/spark-project/hive/hive-cli/1.2.1.spark/hive-cli-1.2.1.spark.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

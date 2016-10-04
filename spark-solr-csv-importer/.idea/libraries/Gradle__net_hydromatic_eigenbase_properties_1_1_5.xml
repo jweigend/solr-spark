@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: net.hydromatic:eigenbase-properties:1.1.5">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/net/hydromatic/eigenbase-properties/1.1.5/eigenbase-properties-1.1.5.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

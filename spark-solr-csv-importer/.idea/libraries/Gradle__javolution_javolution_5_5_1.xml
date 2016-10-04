@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: javolution:javolution:5.5.1">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/javolution/javolution/5.5.1/javolution-5.5.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

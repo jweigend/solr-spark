@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: org.apache.lucene:lucene-highlighter:6.2.0">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-highlighter/6.2.0/lucene-highlighter-6.2.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
