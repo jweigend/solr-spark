@@ -20,8 +20,8 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Some;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -41,7 +41,7 @@ public class ExportHandlerRddTest {
             context.addJar("./build/libs/spark-solr-csv-analyzer-1.0-SNAPSHOT-all.jar");
 
             // make sure executors are up an running
-            context.parallelize(Collections.EMPTY_LIST, 20).map(n -> n);
+            context.parallelize(new ArrayList<String>(), 20).map(n -> n);
 
             Date start = new Date();
 
