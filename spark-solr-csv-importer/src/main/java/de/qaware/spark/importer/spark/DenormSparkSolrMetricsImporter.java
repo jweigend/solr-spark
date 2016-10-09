@@ -45,7 +45,7 @@ import java.util.UUID;
  * Created by weigend on 20.09.16.
  */
 public class
-SparkSolrMetricsImporter implements MetricsImporter, Serializable {
+DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
 
     /**
      * The batch size for imports. Batching is important.
@@ -71,13 +71,13 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
     /**
      *  A default constructor is required by Spark to serialize this class and their lambdas.
      */
-    public SparkSolrMetricsImporter() {
+    public DenormSparkSolrMetricsImporter() {
     }
 
     /**
      * Initializes this class with a Zookeeper Url for Solr Cloud and a Spark Master to run this code.
      */
-    public SparkSolrMetricsImporter(String zkHost) {
+    public DenormSparkSolrMetricsImporter(String zkHost) {
         this.zkHost = zkHost;
     }
 
@@ -130,8 +130,7 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
         final CloudSolrClient solrCloudClient = new CloudSolrClient.Builder().withZkHost(zkHost).build();
         solrCloudClient.setDefaultCollection(COLLECTION_NAME);
 
-        //HttpSolrClient solrLocalClient = new HttpSolrClient.Builder("http://localhost:8983/solr/ekgdata2").build();
-        //solr = solrLocalClient;
+        //HttpSolrClient solrCloudClient = new HttpSolrClient.Builder("http://localhost:8983/solr/ekgdata2").build();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream.open()), 1000000)) {
             String line;
@@ -160,7 +159,7 @@ SparkSolrMetricsImporter implements MetricsImporter, Serializable {
             }
 
         } catch (IOException | SolrServerException e) {
-            //Logger.getLogger(SparkSolrMetricsImporter.class.getName()).warning(e.getMessage());
+            //Logger.getLogger(SimpleSparkSolrMetricsImporter.class.getName()).warning(e.getMessage());
             System.err.println(e.getMessage());
         }
     }

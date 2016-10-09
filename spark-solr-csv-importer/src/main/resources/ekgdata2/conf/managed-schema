@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="ekg-data" version="1.6">
+
+      <types>
+        <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
+        <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+        <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true" docValues="true" />
+
+        <!-- boolean type: "true" or "false" -->
+        <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+        <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+
+
+        <!-- Unique ID type -->
+        <fieldType name="uuid" class="solr.UUIDField" indexed="true"/>
+
+        <!-- Date -->
+        <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+        <fieldType name="tdates" class="solr.TrieDateField" docValues="true" precisionStep="6" positionIncrementGap="0" multiValued="true"/>
+
+
+        <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="double" class="solr.TrieDoubleField" precisionStep="0" positionIncrementGap="0"/>
+
+        <fieldType name="tints" class="solr.TrieIntField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+        <fieldType name="tfloats" class="solr.TrieFloatField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+        <fieldType name="tlongs" class="solr.TrieLongField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+        <fieldType name="tdoubles" class="solr.TrieDoubleField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+
+
+        <fieldType name="text" class="solr.TextField">
+            <analyzer>
+                <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            </analyzer>
+        </fieldType>
+
+        <fieldType name="binary" class="solr.BinaryField"/>
+
+    </types>
+
+    <fields>
+        <field name="_version_" type="long" indexed="true" stored="true"/>
+        <field name="id" type="uuid" indexed="true" stored="true" required="true" docValues="true"/>
+        <field name="date" type="tdate" indexed="true" stored="true" required="true" docValues="true"/>
+        <field name="host" type="string" indexed="true" stored="true" required="true" docValues="true"/>
+        <field name="process" type="string" indexed="true" stored="true" required="true" docValues="true"/>
+        <field name="type" type="string" indexed="true" stored="true" required="true" docValues="true"/>
+        <field name="metric" type="string" indexed="true" stored="true" required="true" docValues="true"/>
+        <field name="value" type="double" indexed="true" stored="true" required="true" docValues="true"/>
+    </fields>
+
+    <!-- Field to use to determine and enforce document uniqueness. Unless this field is marked with required="false", it will be a required field -->
+    <uniqueKey>id</uniqueKey>
+    <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+    <defaultSearchField>metric</defaultSearchField>
+    <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+    <solrQueryParser defaultOperator="OR"/>
+
+</schema>
