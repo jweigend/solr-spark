@@ -28,29 +28,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Parallel CSV Import Sample. Metric CSVs must have the following form:
- *
+ * <p>
  * CSV
  * ----------------------------------------------------------
  * Date; Metric-Name1; Metric2; Metric3 ...
  * dd.MM.yyyy HH:mm:ss.SSS; 100,100,100.000 (US Format)
  * ----------------------------------------------------------
- *
+ * <p>
  * Created by weigend on 20.09.16.
  */
 public class
 DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
-
-    /**
-     * The batch size for imports. Batching is important.
-     */
-    private static final int BATCH_SIZE = 100000;
 
     /**
      * The delimiter of the imported files.
@@ -60,16 +53,21 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
     /**
      * The collection name of the Solr collection to import the data.
      */
-    private static final String COLLECTION_NAME = "ekgdata2";
+    private static final String COLLECTION_NAME = "ekgdata3";
 
     /**
      * The Zookeeper URL (host/port). f.e. localhost:2181.
      */
     private String zkHost;
 
+    /**
+     * Our CSV Dateformat.
+     */
+    private final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS", Locale.US);
+
 
     /**
-     *  A default constructor is required by Spark to serialize this class and their lambdas.
+     * A default constructor is required by Spark to serialize this class and their lambdas.
      */
     public DenormSparkSolrMetricsImporter() {
     }
@@ -85,8 +83,8 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
      * Parallel Solr import using Spark.
      *
      * @param pathUrl the URL could be a local file or path or a hdfs path.
-     *                @see SparkContext#binaryFiles(String, int)  method.
      * @param jsc     The context.
+     * @see SparkContext#binaryFiles(String, int)  method.
      */
     public void importMetrics(String pathUrl, JavaSparkContext jsc) {
 
@@ -95,10 +93,6 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
 
         // default: max tasks - full parallelism.
         jsc.parallelize(rdd.toArray()).foreach(new ImporterImpl()::importFile);
-
-        // One task per file/segment
-        // long totalCount = rdd.count();
-        // rdd.repartition((int) totalCount).foreach(new ImporterImpl()::importFile);
     }
 
     /**
@@ -124,13 +118,9 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
      */
     private void importIntoSolr(String fileUrl, PortableDataStream fileStream) throws ParseException {
 
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS", Locale.US);
-
         // Cloud Client
         final CloudSolrClient solrCloudClient = new CloudSolrClient.Builder().withZkHost(zkHost).build();
         solrCloudClient.setDefaultCollection(COLLECTION_NAME);
-
-        //HttpSolrClient solrCloudClient = new HttpSolrClient.Builder("http://localhost:8983/solr/ekgdata2").build();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream.open()), 1000000)) {
             String line;
@@ -139,70 +129,94 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
             // Caution: This only works with files < 128 MB / One Hadoop Block
             String firstLine = reader.readLine();
             String[] fieldNames = firstLine.split(DELIMITER);
+            if (!fieldNames[0].equals("Date")) {
+                Logger.getLogger(SimpleSparkSolrMetricsImporter.class.getName()).warning("Unknown file format!");
+                return;
+            }
+
+            // Build a list of value JSON strings. Each string contains the values of a single CSV row.
+            List<StringBuilder> valuesList = new ArrayList<>();
+            for (int i = 1; i < fieldNames.length; i++) {
+                valuesList.add(new StringBuilder("values: ["));
+            }
 
             // split host/process/type information out of the filename
-            FileNameParts parts = new FileNameParts(fileUrl);
+            FileMetadata parts = new FileMetadata(fileUrl);
+
+            Date minDate = null;
+            Date maxDate = null;
 
             // loop over csv file, produce and add documents
-            List<SolrInputDocument> documents = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
-                List<SolrInputDocument> docs = createDocumentFromLine(line, fieldNames, parts, dateFormat);
-                documents.addAll(docs);
-                if (documents.size() > BATCH_SIZE) {
-                    solrCloudClient.add(documents);
-                    documents.clear();
+
+                String[] values = line.split(DELIMITER);
+                if (minDate == null) {
+                    minDate = DATE_FORMAT.parse(values[0]);
+                } else {
+                    maxDate = DATE_FORMAT.parse(values[0]);
+                }
+
+                // Produce a long String containing a JSON rep of all date:value Pairs
+                for (int i = 1; i < fieldNames.length; i++) {
+                    valuesList.get(i - 1)
+                            .append("{ d:\"")
+                            .append(values[0])
+                            .append("\",v:\"")
+                            .append(values[i])
+                            .append("\"},");
                 }
             }
-            if (!documents.isEmpty()) {
-                solrCloudClient.add(documents); // add the rest (last chunk)
-                solrCloudClient.commit();
+
+            List<SolrInputDocument> documents = new ArrayList<>();
+            int metricIdx = 1;
+            for (StringBuilder values : valuesList) {
+                values.append("]"); // close json array
+                String metric = fieldNames[metricIdx++];
+
+                byte[] compressedJson = StringCompressor.compress(values.toString());
+                String compressedJsonBase64 = Base64.getEncoder().encodeToString(compressedJson);
+
+                documents.add(createDocument(parts, metric, compressedJsonBase64, minDate, maxDate));
             }
 
+            solrCloudClient.add(documents);
+            solrCloudClient.commit();
+
         } catch (IOException | SolrServerException e) {
-            //Logger.getLogger(SimpleSparkSolrMetricsImporter.class.getName()).warning(e.getMessage());
-            System.err.println(e.getMessage());
+            Logger.getLogger(SimpleSparkSolrMetricsImporter.class.getName()).warning(e.getMessage());
         }
     }
 
     /**
-     * Helper to import a single csv line.
-     *
-     * @param line       the line.
-     * @param fieldNames the field names.
-     * @param parts      infos about the filename.
-     * @param dateFormat the date format.
-     * @return a solr input document.
+     * Create a single Solr document.
+     * @param meta the file metadata.
+     * @param metric the metric name.
+     * @param base64GZippedValues The denormalized JSON KV values array. GZipped and Base64 encoded.
+     * @return a Solr document.
      */
-    private List<SolrInputDocument> createDocumentFromLine(String line, String[] fieldNames, FileNameParts parts, DateFormat dateFormat) throws ParseException {
-        NumberFormat format = new DecimalFormat();
-
-        String[] values = line.split(DELIMITER);
-        List<SolrInputDocument> docs = new ArrayList<>();
-        // 1st field ist the date field
-        for (int i = 1; i < fieldNames.length; i++) {
-            SolrInputDocument document = new SolrInputDocument();
-            // do not use "NEW" here
-            document.addField("id", UUID.randomUUID().toString());
-            document.addField("date", dateFormat.parse(values[0]));
-            document.addField("process", parts.getProcessName());
-            document.addField("host", parts.getHostName());
-            document.addField("type", parts.getType());
-            document.addField("metric", fieldNames[i]);
-            document.addField("value", format.parse(values[i]));
-            docs.add(document);
-        }
-        return docs;
+    private SolrInputDocument createDocument(FileMetadata meta, String metric, String base64GZippedValues, Date minDate, Date maxDate) {
+        SolrInputDocument document = new SolrInputDocument();
+        // do not use "NEW" here
+        document.addField("id", UUID.randomUUID().toString());
+        document.addField("process", meta.getProcessName());
+        document.addField("host", meta.getHostName());
+        document.addField("type", meta.getType());
+        document.addField("metric", metric);
+        document.addField("values", base64GZippedValues);
+        document.addField("mindate", minDate);
+        document.addField("maxdate", maxDate);
+        return document;
     }
 
     /**
      * Extract information out of a filename.
      */
-    private static final class FileNameParts {
+    private static final class FileMetadata {
         private String processName;
         private String type;
         private String hostName;
 
-        FileNameParts(String fileUrl) {
+        FileMetadata(String fileUrl) {
             String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
             String[] splits = fileName.split("_");
             this.hostName = splits[0];

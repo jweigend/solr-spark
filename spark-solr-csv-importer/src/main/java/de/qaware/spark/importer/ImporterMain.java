@@ -14,7 +14,8 @@
 package de.qaware.spark.importer;
 
 import de.qaware.spark.importer.spark.CachedSparkContext;
-import de.qaware.spark.importer.spark.SparkSolrMetricsImporter;
+import de.qaware.spark.importer.spark.DenormSparkSolrMetricsImporter;
+import de.qaware.spark.importer.spark.SimpleSparkSolrMetricsImporter;
 
 import java.util.Date;
 
@@ -29,7 +30,8 @@ public class ImporterMain {
         // final String solrZkHost = "localhost:9983";
         // final String sparkMasterUrl = "local[8]";
 
-        final String csvImportPath = "hdfs://192.168.1.100:/2015-KW-10-01";
+        //final String csvImportPath = "hdfs://192.168.1.100:/2015-KW-10-01";
+        final String csvImportPath = "hdfs://192.168.1.100:/csv-all";
         final String solrZkHost = "192.168.1.100:2181";
         final String sparkMasterUrl = "spark://192.168.1.100:7077";
 
@@ -38,7 +40,8 @@ public class ImporterMain {
         // initialize spark context
         CachedSparkContext sparkContext = CachedSparkContext.instance(sparkMasterUrl);
 
-        MetricsImporter importer = new SparkSolrMetricsImporter(solrZkHost);
+        //MetricsImporter importer = new SimpleSparkSolrMetricsImporter(solrZkHost);
+        MetricsImporter importer = new DenormSparkSolrMetricsImporter(solrZkHost);
         importer.importMetrics(csvImportPath, sparkContext.getSparkContext());
 
         Date end = new Date();
