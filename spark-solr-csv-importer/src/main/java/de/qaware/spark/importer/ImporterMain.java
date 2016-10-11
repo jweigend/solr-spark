@@ -29,8 +29,9 @@ public class ImporterMain {
         // final String csvImportPath = "./build/resources/main/data/wls1_jmx_lpapp18.csv";
         // final String solrZkHost = "localhost:9983";
         // final String sparkMasterUrl = "local[8]";
-        //final String csvImportPath = "hdfs://192.168.1.100:/csv-all";
+        // final String csvImportPath = "hdfs://192.168.1.100:/csv-all";
 
+        // Path contains 14 files with one million of cells each
         final String csvImportPath = "hdfs://192.168.1.100:/2015-KW-10-01";
         final String solrZkHost = "192.168.1.100:2181";
         final String sparkMasterUrl = "spark://192.168.1.100:7077";
@@ -49,6 +50,6 @@ public class ImporterMain {
 
         Date end = new Date();
 
-        System.out.println("Import: Time taken - " + (end.getTime() - start.getTime()) + " ms.");
+        System.out.println("Import takes " + (end.getTime() - start.getTime()) + " ms.");
     }
 }
