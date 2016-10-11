@@ -11,7 +11,7 @@
           License:      Apache License 2.0
   _____________________________________________________________________________
  */
-package de.qaware.spark.importer.spark;
+package de.qaware.spark.importer.spark.util;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;

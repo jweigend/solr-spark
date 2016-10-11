@@ -14,8 +14,10 @@
 package de.qaware.spark.importer.spark;
 
 import de.qaware.spark.importer.MetricsImporter;
+import de.qaware.spark.importer.spark.util.PooledSolrClient;
+import de.qaware.spark.importer.spark.util.StringCompressor;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -91,8 +93,10 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
         // Get a collection of all files in the given path.
         JavaPairRDD<String, PortableDataStream> rdd = jsc.binaryFiles(pathUrl);
 
+        List<Tuple2<String, PortableDataStream>> files = rdd.toArray();
+
         // default: max tasks - full parallelism.
-        jsc.parallelize(rdd.toArray()).foreach(new ImporterImpl()::importFile);
+        jsc.parallelize(files, files.size()).foreach(new ImporterImpl()::importFile);
     }
 
     /**
@@ -118,11 +122,11 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
      */
     private void importIntoSolr(String fileUrl, PortableDataStream fileStream) throws ParseException {
 
-        // Cloud Client
-        final CloudSolrClient solrCloudClient = new CloudSolrClient.Builder().withZkHost(zkHost).build();
-        solrCloudClient.setDefaultCollection(COLLECTION_NAME);
-
+        SolrClient solrCloudClient = null;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream.open()), 1000000)) {
+
+            solrCloudClient = PooledSolrClient.getInstance(zkHost, COLLECTION_NAME).getClient();
+
             String line;
 
             // assuming first line is a csv header
@@ -184,6 +188,10 @@ DenormSparkSolrMetricsImporter implements MetricsImporter, Serializable {
 
         } catch (IOException | SolrServerException e) {
             Logger.getLogger(SimpleSparkSolrMetricsImporter.class.getName()).warning(e.getMessage());
+        } finally {
+            if (solrCloudClient != null) {
+                PooledSolrClient.getInstance(zkHost, COLLECTION_NAME).takeBack(solrCloudClient);
+            }
         }
     }
 

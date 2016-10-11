@@ -1,4 +1,4 @@
-package de.qaware.spark.importer.spark;
+package de.qaware.spark.importer.spark.util;
 
 import java.io.*;
 import java.util.zip.DeflaterOutputStream;

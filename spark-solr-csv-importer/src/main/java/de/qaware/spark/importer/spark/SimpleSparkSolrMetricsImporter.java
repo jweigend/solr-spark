@@ -66,13 +66,14 @@ SimpleSparkSolrMetricsImporter implements MetricsImporter, Serializable {
     /**
      * The Zookeeper URL (host/port). f.e. localhost:2181.
      */
-    private String zkHost;
+    private final String zkHost;
 
 
     /**
      *  A default constructor is required by Spark to serialize this class and their lambdas.
      */
     public SimpleSparkSolrMetricsImporter() {
+        zkHost = null;
     }
 
     /**
