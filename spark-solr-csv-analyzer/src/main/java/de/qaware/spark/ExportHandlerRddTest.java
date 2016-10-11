@@ -51,7 +51,7 @@ public class ExportHandlerRddTest {
 
             // required parameters for the /export request handler are fl and sort
             solrQuery.set("fl", "date,metric,host,process,value");
-            solrQuery.set("sort", "data asc");
+            solrQuery.set("sort", "date asc");
             solrQuery.set("qt", "/export");
 
             // this does a parallel standard cursor based deep query
