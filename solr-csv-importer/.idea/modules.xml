@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SolrImporter.iml" filepath="$PROJECT_DIR$/.idea/modules/SolrImporter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SolrImporter_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SolrImporter_main.iml" group="SolrImporter" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SolrImporter_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SolrImporter_test.iml" group="SolrImporter" />
+    </modules>
+  </component>
+</project>
