@@ -1,0 +1,68 @@
+
+#
+# Simple stats on a all metrics
+#
+curl http://192.168.1.100:8983/solr/ekgdata2/select -d '
+     q=process:wls1&
+     rows=0&
+     json.facet={ 
+          Average : "avg(value)",
+          Minimum : "min(value)",
+          Maximum : "max(value)"
+     }
+' > r.xml; open -a Safari r.xml  
+
+#
+# Simple stats on a single metric
+#
+curl http://192.168.1.100:8983/solr/ekgdata2/select -d '
+     q=process:wls1 AND metric:*.HeapMemoryUsage.used&
+     rows=0&
+     json.facet={ 
+          AverageHeapUsage : "avg(value)",
+          MinimumHeapUsage : "min(value)",
+          MaximumHeapUsage : "max(value)"
+     }
+' > r.xml; open -a Safari r.xml  
+
+#
+# Simple stats on a single metric grouped by host
+#
+curl http://192.168.1.100:8983/solr/ekgdata2/select -d '
+     q=process:wls1 AND metric:*.HeapMemoryUsage.used&
+     rows=0&
+     json.facet={ 
+     	  Hosts: {
+     	  	type: terms,
+     	  	field: host,
+     	  	facet: {
+     	  		AverageHeapUsage : "avg(value)",
+          		MinimumHeapUsage : "min(value)",
+          		MaximumHeapUsage : "max(value)"
+     	  	}
+     	  }
+     }
+' > r.xml; open -a Safari r.xml  
+
+#
+# Grouping per sub query
+#
+curl http://192.168.1.100:8983/solr/ekgdata2/select -d '
+     q=process:wls1 AND metric:*.HeapMemoryUsage.used&
+     rows=0&
+     json.facet={ 
+     	  Hosts: {
+     	  	type: terms,
+     	  	field: host,
+     	  	facet:{
+            	Off :  { query : "value: [* TO 0]" },
+            	Idle : { query : "value: [0 TO 1000000000]" },
+            	Busy : { query : "value: [1000000001 TO 10000000000]" },
+            	Overload : { query : "value: [10000000001 TO *]" }
+     	  	}
+     	  }
+     }
+' > r.xml; open -a Safari r.xml  
+
+
+
