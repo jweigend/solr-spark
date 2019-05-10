@@ -1,0 +1,29 @@
+==============
+ SOLR DEMO
+  BigData 2016
+==============
+
+1. SOLR starten:
+----------------
+cd /Volumes/JAX2016/opt/solr/bin
+solr start -e cloud
+ -> 2 Server
+ -> Name der Collection: bigdata2016 (siehe unten)
+
+Vorbereitung:
+
+ -- 0. Eventuell Collection loeschen
+http://localhost:8983/solr/admin/collections?action=DELETE&name=bigdata2016
+
+ -- 1. Collection in Zookeeer laden
+./zkcli.sh -cmd upconfig -zkhost localhost:9983 -confname bigdata2016 -solrhome=/Volumes/JAX2016/opt/solr/server/solr -confdir /Volumes/JAX2016/opt/solr/server/solr/configsets/jax_configs/conf
+
+ -- 2. Collection neu anlegen
+curl 'http://localhost:8983/solr/admin/collections?action=CREATE&name=bigdata2016&numShards=8&replicationFactor=1&maxShardsPerNode=4&collection.configName=bigdata2016'
+
+2. Daten importieren:
+---------------------
+NetBeans starten:
+/opt/codebase/SolrImporter zeigen
+
+ --> Daten zeigen: Data WA_Fn-UseC_-Marketing-Customer-Value-Analysis.csv
